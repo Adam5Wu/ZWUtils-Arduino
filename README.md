@@ -11,7 +11,7 @@
 	- [ESPAsyncWebServer fork](https://github.com/Adam5Wu/ESPAsyncWebServer)
 	- [esp8266FTPServer fork](https://github.com/Adam5Wu/esp8266FTPServer)
 
-Jack of all trades utility collection for Arduino
+Jack of all trades utility collection for Arduino.
 
 ## Purpose
 
