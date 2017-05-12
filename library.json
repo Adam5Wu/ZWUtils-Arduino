@@ -1,0 +1,17 @@
+{
+  "name":"ZWUtils-Arduino",
+  "description":"ZWUtils for Arduino",
+  "keywords":"utilities,linkedlist",
+  "authors":
+  {
+    "name": "Zhenyu Wu",
+    "maintainer": true
+  },
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/Adam5Wu/ZWUtils-Arduino.git"
+  },
+  "frameworks": "arduino",
+  "platforms":"*",
+}
