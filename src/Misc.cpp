@@ -20,7 +20,6 @@
  */
 
 #include "Arduino.h"
-#include "md5.h"
 
 #include "Misc.h"
 
@@ -32,21 +31,45 @@ char const HexLookup_UC[] =
 char const HexLookup_LC[] =
 { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
+#include "md5.h"
+
 void calcMD5(uint8_t* data, uint16_t len, uint8_t *out) {
-  md5_context_t _ctx;
-  MD5Init(&_ctx);
-  MD5Update(&_ctx, data, len);
-  MD5Final(out, &_ctx);
+	md5_context_t _ctx;
+	MD5Init(&_ctx);
+	MD5Update(&_ctx, data, len);
+	MD5Final(out, &_ctx);
 }
 
 void textMD5(uint8_t* data, uint16_t len, char *text, char const *Lookup) {
 	uint8_t buf[16];
 	calcMD5(data,len,buf);
-  for(uint8_t i = 0; i < 16; i++) {
+	for(uint8_t i = 0; i < 16; i++) {
 		text[i*2+0] = Lookup[(buf[i] >> 4) & 0xF];
 		text[i*2+1] = Lookup[(buf[i] >> 0) & 0xF];
-  }
+	}
 }
+
+#if ESPZW_SHA256
+
+#include "sha256.h"
+	
+void calcSHA256(uint8_t* data, uint16_t len, uint8_t *out) {
+	sha256_context_t _ctx;
+	SHA256Init(&_ctx);
+	SHA256Update(&_ctx, data, len);
+	SHA256Final(out, &_ctx);
+}
+
+void textSHA256(uint8_t* data, uint16_t len, char *text, char const *Lookup) {
+	uint8_t buf[64];
+	calcSHA256(data,len,buf);
+	for(uint8_t i = 0; i < 64; i++) {
+		text[i*2+0] = Lookup[(buf[i] >> 4) & 0xF];
+		text[i*2+1] = Lookup[(buf[i] >> 0) & 0xF];
+	}
+}
+
+#endif
 
 String getQuotedToken(char const *&ptr, char const delim) {
 	String Ret;
@@ -64,7 +87,7 @@ String getQuotedToken(char const *&ptr, char const delim) {
 			} else Ret.concat(*ptr);
 		}
 		if (!unquote)
-			ESPZW_DEBUG("WARNING: Unterminated quoted string\n",Ret.c_str());
+			ESPZW_DEBUG("WARNING: Un-terminated quoted string\n",Ret.c_str());
 	} else {
 		while (*ptr) {
 			if (*ptr == delim) {
