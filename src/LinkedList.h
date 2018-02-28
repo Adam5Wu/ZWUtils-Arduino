@@ -31,9 +31,7 @@ class LinkedListNode {
 		LinkedListNode<T>* next;
 
 		LinkedListNode(const T &val): _value(val), next(NULL) {}
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 		LinkedListNode(T &&val): _value(std::move(val)), next(NULL) {}
-#endif
 
 		const T& value() const { return _value; };
 		T& value(){ return _value; }
@@ -91,7 +89,6 @@ class LinkedList {
 		: LinkedList(onRemove) { for (auto& item : items) append(item); }
 		virtual ~LinkedList() { clear(); }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 		LinkedList(LinkedList &&src)
 		: _head(src._head), _tail(src._tail), _count(src._count), _onRemove(std::move(src._onRemove))
 		{ src._head = src._tail = NULL; src._count = 0; }
@@ -102,7 +99,6 @@ class LinkedList {
 			_onRemove = std::move(src._onRemove);
 			src._head = src._tail = NULL; src._count = 0;
 		}
-#endif
 
 		bool isEmpty() const { return _head == NULL; }
 		T& front() const { return _head->value(); }
@@ -111,13 +107,9 @@ class LinkedList {
 		ConstIterator end() const { return ConstIterator(NULL); }
 
 		size_t prepend(const T& t) { return _addhead(new ItemType(t)); }
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 		size_t prepend(T && t) { return _addhead(new ItemType(std::move(t))); }
-#endif
 		size_t append(const T& t) { return _addtail(new ItemType(t)); }
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
 		size_t append(T && t) { return _addtail(new ItemType(std::move(t))); }
-#endif
 
 		size_t length() const { return _count; }
 

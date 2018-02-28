@@ -28,7 +28,7 @@
 #endif
 	
 #ifndef ESPZW_DEBUG_LEVEL
-#define ESPZW_DEBUG_LEVEL 1
+#define ESPZW_DEBUG_LEVEL 3
 #endif
 
 #if ESPZW_DEBUG_LEVEL < 1
