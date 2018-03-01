@@ -101,7 +101,7 @@ String getQuotedToken(char const *&ptr, char const delim) {
 }
 
 void putQuotedToken(String const &token, String &out, char const delim, bool delimPfx, bool forceQuote) {
-	if (!out.empty() && delimPfx) out.concat(delim);
+	if (out && delimPfx) out.concat(delim);
 	if (forceQuote || token.indexOf(delim) >= 0 || token[0] == '"') {
 		out.concat('"');
 		for (int idx = 0; idx < token.length(); idx++) {
@@ -111,4 +111,68 @@ void putQuotedToken(String const &token, String &out, char const delim, bool del
 		}
 		out.concat('"');
 	} else out.concat(token);	
+}
+
+bool pathIsAbsolute(String const &path) {
+	return path? path[0] == '/' : false;
+}
+
+String pathGetParent(String const &path) {
+	int delim_pos = path.lastIndexOf('/');
+	if (delim_pos < 0) return String::EMPTY;
+	if (delim_pos == 0) return "/";
+	return String(path.begin(), delim_pos);
+}
+
+String pathGetEntryName(String const &path) {
+	int delim_pos = path.lastIndexOf('/');
+	if (delim_pos < 0) return path;
+	return path.begin() + delim_pos;
+}
+
+String pathAppend(String const &path, const char *token) {
+	String Ret(path);
+	Ret.concat('/');
+	Ret.concat(token);
+	return Ret;
+}
+
+String pathAppend(String const &path, String const &token) {
+	String Ret(path);
+	Ret.concat('/');
+	Ret.concat(token);
+	return Ret;
+}
+
+fs::Dir mkdir(fs::FS &fs, String const &path) {
+	if (!pathIsAbsolute(path)) {
+		ESPZW_DEBUG("WARNING: Unable to create dir - not an absolute path\n");
+		return fs::Dir();
+	}
+	return fs.openDir(path.c_str(), !fs.exists(path));
+}
+
+static fs::Dir mkdirs_recursive(fs::FS &fs, String const &path) {
+	if (fs.exists(path)) {
+		ESPZW_DEBUGV("Opening directory '%s'\n", path.c_str());
+		return fs.openDir(path.c_str());
+	}
+	
+	auto parentPath = pathGetParent(path);
+	ESPZW_DEBUGV("Checking directory '%s'\n", parentPath.c_str());
+	auto parentDir = mkdirs_recursive(fs, parentPath);
+	if (!parentDir) {
+		ESPZW_DEBUG("WARNING: Unable to create parent dir '%s'\n", parentPath.c_str());
+		return parentDir;
+	}
+	ESPZW_DEBUGV("Creating directory '%s'\n", path.c_str());
+	return parentDir.openDir(path.c_str(), true);
+}
+
+fs::Dir mkdirs(fs::FS &fs, String const &path) {
+	if (!pathIsAbsolute(path)) {
+		ESPZW_DEBUG("WARNING: Unable to create dir - not an absolute path\n");
+		return fs::Dir();
+	}
+	return mkdirs_recursive(fs, path);
 }

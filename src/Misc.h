@@ -28,7 +28,7 @@
 #endif
 	
 #ifndef ESPZW_DEBUG_LEVEL
-#define ESPZW_DEBUG_LEVEL 3
+#define ESPZW_DEBUG_LEVEL 1
 #endif
 
 #if ESPZW_DEBUG_LEVEL < 1
@@ -92,4 +92,15 @@ inline void textSHA256_LC(uint8_t* data, uint16_t len, char *text)
 String getQuotedToken(char const *&ptr, char const delim = ';');
 void putQuotedToken(String const &token, String &out, char const delim = ';', bool delimPfx = true, bool forceQuote = false);
 
+#include "FS.h"
+	
+bool pathIsAbsolute(String const &path);
+String pathGetParent(String const &path);
+String pathGetEntryName(String const &path);
+String pathAppend(String const &path, const char *token);
+String pathAppend(String const &path, String const &token);
+	
+fs::Dir mkdir(fs::FS &fs, String const &path);	
+fs::Dir mkdirs(fs::FS &fs, String const &path);
+	
 #endif
