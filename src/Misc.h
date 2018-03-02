@@ -22,9 +22,20 @@
 #define Misc_H_
 
 #include "WString.h"
+#include <pgmspace.h>
 
+#define PROGMEM_C  __attribute__((section(".irom.text.log.common")))
+#define PROGMEM_T  __attribute__((section(".irom.text.log.template")))
+#define PROGMEM_L  __attribute__((section(".irom.text.log.local")))
+	
 #ifndef ESPZW_LOG
-#define ESPZW_LOG(...) Serial.printf(__VA_ARGS__)
+#define ESPZW_LOG_X(spfx, fmt, ...)					\
+{ 													\
+	static const char pfmt[] PROGMEM ## spfx = fmt;	\
+	Serial.printf_P(pfmt, ## __VA_ARGS__);			\
+}
+#define ESPZW_LOG_S(sect, fmt, ...)	ESPZW_LOG_X(_ ## sect,fmt, ## __VA_ARGS__)
+#define ESPZW_LOG(fmt, ...) ESPZW_LOG_S(C,fmt, ## __VA_ARGS__)
 #endif
 	
 #ifndef ESPZW_DEBUG_LEVEL
@@ -34,28 +45,33 @@
 #if ESPZW_DEBUG_LEVEL < 1
 	#define ESPZW_DEBUGDO(...)
 	#define ESPZW_DEBUG(...)
+	#define ESPZW_DEBUG_S(...)
 #else
 	#define ESPZW_DEBUGDO(...) __VA_ARGS__
 	#define ESPZW_DEBUG(...) ESPZW_LOG(__VA_ARGS__)
+	#define ESPZW_DEBUG_S(...) ESPZW_LOG_S(__VA_ARGS__)
 #endif
 
 #if ESPZW_DEBUG_LEVEL < 2
 	#define ESPZW_DEBUGVDO(...)
 	#define ESPZW_DEBUGV(...)
-#else
+	#define ESPZW_DEBUGV_S(...)
+	#else
 	#define ESPZW_DEBUGVDO(...) __VA_ARGS__
 	#define ESPZW_DEBUGV(...) ESPZW_LOG(__VA_ARGS__)
+	#define ESPZW_DEBUGV_S(...) ESPZW_LOG_S(__VA_ARGS__)
 #endif
 
 #if ESPZW_DEBUG_LEVEL < 3
 	#define ESPZW_DEBUGVVDO(...)
 	#define ESPZW_DEBUGVV(...)
+	#define ESPZW_DEBUGVV_S(...)
 #else
 	#define ESPZW_DEBUGVVDO(...) __VA_ARGS__
 	#define ESPZW_DEBUGVV(...) ESPZW_LOG(__VA_ARGS__)
+	#define ESPZW_DEBUGVV_S(...) ESPZW_LOG_S(__VA_ARGS__)
 #endif
 
-extern String const EMPTY_STRING;
 extern char const HexLookup_UC[];
 extern char const HexLookup_LC[];
 
