@@ -50,7 +50,7 @@ void textMD5(uint8_t* data, uint16_t len, char *text, char const *Lookup) {
 #if ESPZW_SHA256
 
 #include "sha256.h"
-	
+
 void calcSHA256(uint8_t* data, uint16_t len, uint8_t *out) {
 	sha256_context_t _ctx;
 	SHA256Init(&_ctx);
@@ -108,7 +108,7 @@ void putQuotedToken(String const &token, String &out, char const delim, bool del
 			out.concat(C);
 		}
 		out.concat('"');
-	} else out.concat(token);	
+	} else out.concat(token);
 }
 
 bool pathIsAbsolute(String const &path) {
@@ -155,7 +155,7 @@ static fs::Dir mkdirs_recursive(fs::FS &fs, String const &path) {
 		ESPZW_DEBUGV("Opening directory '%s'\n", path.c_str());
 		return fs.openDir(path.c_str());
 	}
-	
+
 	auto parentPath = pathGetParent(path);
 	ESPZW_DEBUGV("Checking directory '%s'\n", parentPath.c_str());
 	auto parentDir = mkdirs_recursive(fs, parentPath);

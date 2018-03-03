@@ -21,25 +21,39 @@
 #ifndef Misc_H_
 #define Misc_H_
 
+#ifndef ESPZW_LOG_TIME
+#define ESPZW_LOG_TIME 1
+#endif
+
 #include "WString.h"
 #include <pgmspace.h>
+#include <sys/time.h>
 
 #define PROGMEM_C  __attribute__((section(".irom.text.log.common")))
 #define PROGMEM_T  __attribute__((section(".irom.text.log.template")))
 #define PROGMEM_L  __attribute__((section(".irom.text.log.local")))
-	
+
 #ifndef ESPZW_LOG
+#if ESPZW_LOG_TIME
+#define ESPZW_LOG_X(spfx, fmt, ...)															\
+{ 																							\
+	static const char pfmt[] PROGMEM ## spfx = "%5d.%0.3d | " fmt;							\
+	timeval time; gettimeofday(&time, NULL);												\
+	Serial.printf_P(pfmt, (time.tv_sec % 100000), (time.tv_usec / 1000), ## __VA_ARGS__);	\
+}
+#else
 #define ESPZW_LOG_X(spfx, fmt, ...)					\
 { 													\
 	static const char pfmt[] PROGMEM ## spfx = fmt;	\
 	Serial.printf_P(pfmt, ## __VA_ARGS__);			\
 }
+#endif
 #define ESPZW_LOG_S(sect, fmt, ...)	ESPZW_LOG_X(_ ## sect,fmt, ## __VA_ARGS__)
 #define ESPZW_LOG(fmt, ...) ESPZW_LOG_S(C,fmt, ## __VA_ARGS__)
 #endif
-	
+
 #ifndef ESPZW_DEBUG_LEVEL
-#define ESPZW_DEBUG_LEVEL 1
+#define ESPZW_DEBUG_LEVEL 0
 #endif
 
 #if ESPZW_DEBUG_LEVEL < 1
@@ -92,7 +106,7 @@ inline void textMD5_LC(uint8_t* data, uint16_t len, char *text)
 
 #define SHA256_BINLEN	64
 #define SHA256_TXTLEN	(SHA256_BINLEN*2)
-	
+
 // out is a 64 byte buffer
 void calcSHA256(uint8_t* data, uint16_t len, uint8_t *out);
 // text is a 128 char buffer, Lookup is a mapping of hex numbers
@@ -104,19 +118,19 @@ inline void textSHA256_LC(uint8_t* data, uint16_t len, char *text)
 { textSHA256(data,len,text,HexLookup_LC); }
 
 #endif
-	
+
 String getQuotedToken(char const *&ptr, char const delim = ';');
 void putQuotedToken(String const &token, String &out, char const delim = ';', bool delimPfx = true, bool forceQuote = false);
 
 #include "FS.h"
-	
+
 bool pathIsAbsolute(String const &path);
 String pathGetParent(String const &path);
 String pathGetEntryName(String const &path);
 String pathAppend(String const &path, const char *token);
 String pathAppend(String const &path, String const &token);
-	
-fs::Dir mkdir(fs::FS &fs, String const &path);	
+
+fs::Dir mkdir(fs::FS &fs, String const &path);
 fs::Dir mkdirs(fs::FS &fs, String const &path);
-	
+
 #endif
