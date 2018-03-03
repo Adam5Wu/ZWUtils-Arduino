@@ -18,8 +18,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA	02110-1301	USA
  */
-#ifndef LinkedList_H_
-#define LinkedList_H_
+#ifndef ZWUtils_LinkedList_H_
+#define ZWUtils_LinkedList_H_
 
 #include "stddef.h"
 #include <functional>

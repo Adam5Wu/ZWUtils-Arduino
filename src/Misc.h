@@ -18,8 +18,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA	02110-1301	USA
  */
-#ifndef Misc_H_
-#define Misc_H_
+#ifndef ZWUtils_Misc_H_
+#define ZWUtils_Misc_H_
 
 #ifndef ESPZW_LOG_TIME
 #define ESPZW_LOG_TIME 1
