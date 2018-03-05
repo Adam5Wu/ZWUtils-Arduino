@@ -26,34 +26,37 @@
 #endif
 
 #include "WString.h"
+#include <inttypes.h>
 #include <pgmspace.h>
 #include <sys/time.h>
 
+#ifndef ESPZW_DEBUG_LEVEL
+#define ESPZW_DEBUG_LEVEL 0
+#endif
+	
 #define PROGMEM_C  __attribute__((section(".irom.text.log.common")))
 #define PROGMEM_T  __attribute__((section(".irom.text.log.template")))
 #define PROGMEM_L  __attribute__((section(".irom.text.log.local")))
 
 #ifndef ESPZW_LOG
 #if ESPZW_LOG_TIME
-#define ESPZW_LOG_X(spfx, fmt, ...)															\
-{ 																							\
-	static const char pfmt[] PROGMEM ## spfx = "%5d.%0.3d | " fmt;							\
-	timeval time; gettimeofday(&time, NULL);												\
-	Serial.printf_P(pfmt, (time.tv_sec % 100000), (time.tv_usec / 1000), ## __VA_ARGS__);	\
+#define ESPZW_LOG_X(spfx, fmt, ...)											\
+{ 																			\
+	static const char __pfmt__[] PROGMEM ## spfx =							\
+		"%5"PRIu32".%03"PRIu16" | " fmt;									\
+	timeval __log_time__; gettimeofday(&__log_time__, NULL);				\
+	Serial.printf_P(__pfmt__, (uint32_t)(__log_time__.tv_sec % 100000),		\
+		(uint16_t)(__log_time__.tv_usec / 1000), ## __VA_ARGS__);			\
 }
 #else
-#define ESPZW_LOG_X(spfx, fmt, ...)					\
-{ 													\
-	static const char pfmt[] PROGMEM ## spfx = fmt;	\
-	Serial.printf_P(pfmt, ## __VA_ARGS__);			\
+#define ESPZW_LOG_X(spfx, fmt, ...)							\
+{ 															\
+	static const char __pfmt__[] PROGMEM ## spfx = fmt;		\
+	Serial.printf_P(__pfmt__, ## __VA_ARGS__);				\
 }
 #endif
 #define ESPZW_LOG_S(sect, fmt, ...)	ESPZW_LOG_X(_ ## sect,fmt, ## __VA_ARGS__)
 #define ESPZW_LOG(fmt, ...) ESPZW_LOG_S(C,fmt, ## __VA_ARGS__)
-#endif
-
-#ifndef ESPZW_DEBUG_LEVEL
-#define ESPZW_DEBUG_LEVEL 0
 #endif
 
 #if ESPZW_DEBUG_LEVEL < 1

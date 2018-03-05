@@ -30,11 +30,12 @@ class LinkedListNode {
 	public:
 		LinkedListNode<T>* next;
 
-		LinkedListNode(const T &val): _value(val), next(NULL) {}
-		LinkedListNode(T &&val): _value(std::move(val)), next(NULL) {}
+		LinkedListNode(const T &val): _value(val), next(nullptr) {}
+		LinkedListNode(T &&val): _value(std::move(val)), next(nullptr) {}
+		virtual ~LinkedListNode(void) {}
 
-		const T& value() const { return _value; };
-		T& value(){ return _value; }
+		const T& value(void) const { return _value; }
+		T& value(void){ return _value; }
 };
 
 template <typename T, template<typename> class ItemT = LinkedListNode>
@@ -45,12 +46,12 @@ class LinkedList {
 		class Iterator {
 				ItemType* _node;
 			public:
-				Iterator(ItemType* current = NULL) : _node(current) {}
+				Iterator(ItemType* current = nullptr) : _node(current) {}
 				Iterator(const Iterator& i) : _node(i._node) {}
-				Iterator& operator ++() { _node = _node->next; return *this; }
+				Iterator& operator ++(void) { _node = _node->next; return *this; }
 				bool operator != (const Iterator& i) const { return _node != i._node; }
-				const T& operator * () const { return _node->value(); }
-				const T* operator -> () const { return &_node->value(); }
+				const T& operator * (void) const { return _node->value(); }
+				const T* operator -> (void) const { return &_node->value(); }
 		};
 
 		typedef const Iterator ConstIterator;
@@ -84,34 +85,34 @@ class LinkedList {
 		}
 	public:
 		LinkedList(OnRemove const &onRemove)
-		: _head(NULL), _tail(NULL), _count(0), _onRemove(onRemove) {}
+		: _head(nullptr), _tail(nullptr), _count(0), _onRemove(onRemove) {}
 		LinkedList(OnRemove const &onRemove, std::initializer_list<T> items)
 		: LinkedList(onRemove) { for (auto& item : items) append(item); }
-		virtual ~LinkedList() { clear(); }
+		virtual ~LinkedList(void) { clear(); }
 
 		LinkedList(LinkedList &&src)
 		: _head(src._head), _tail(src._tail), _count(src._count), _onRemove(std::move(src._onRemove))
-		{ src._head = src._tail = NULL; src._count = 0; }
+		{ src._head = src._tail = nullptr; src._count = 0; }
 
 		LinkedList& operator=(LinkedList &&src) {
 			clear();
 			_head = src._head; _tail = src._tail; _count = src._count;
 			_onRemove = std::move(src._onRemove);
-			src._head = src._tail = NULL; src._count = 0;
+			src._head = src._tail = nullptr; src._count = 0;
 		}
 
-		bool isEmpty() const { return _head == NULL; }
-		T& front() const { return _head->value(); }
-		T& back() const { return _tail->value(); }
-		ConstIterator begin() const { return ConstIterator(_head); }
-		ConstIterator end() const { return ConstIterator(NULL); }
+		bool isEmpty(void) const { return _head == nullptr; }
+		T& front(void) const { return _head->value(); }
+		T& back(void) const { return _tail->value(); }
+		ConstIterator begin(void) const { return ConstIterator(_head); }
+		ConstIterator end(void) const { return ConstIterator(nullptr); }
 
 		size_t prepend(const T& t) { return _addhead(new ItemType(t)); }
 		size_t prepend(T && t) { return _addhead(new ItemType(std::move(t))); }
 		size_t append(const T& t) { return _addtail(new ItemType(t)); }
 		size_t append(T && t) { return _addtail(new ItemType(std::move(t))); }
 
-		size_t length() const { return _count; }
+		size_t length(void) const { return _count; }
 
 		size_t count_if(Predicate const &predicate) const {
 			size_t i = 0;
@@ -123,16 +124,16 @@ class LinkedList {
 		}
 
 		T* first(void) const
-		{ return get_if(NULL); }
+		{ return get_if(nullptr); }
 
 		T* get_if(Predicate const &predicate) const
 		{ return get_nth_if(0, predicate); }
 
 		T* get_nth(size_t N) const
-		{ return get_nth_if(N, NULL); }
+		{ return get_nth_if(N, nullptr); }
 
 		T* get_nth_if(size_t N, Predicate const &predicate) const {
-			T* Ret = NULL;
+			T* Ret = nullptr;
 			size_t i = 0;
 			enumerate([&](ItemType *it){
 				if (!predicate || predicate(it->value()))
@@ -151,12 +152,12 @@ class LinkedList {
 		bool remove_if(Predicate const &predicate)
 		{ return remove_nth_if(0, predicate); }
 
-		bool remove_nth(size_t N, Predicate const &takeown=NULL)
-		{ return remove_nth_if(N, NULL, takeown); }
+		bool remove_nth(size_t N, Predicate const &takeown=nullptr)
+		{ return remove_nth_if(N, nullptr, takeown); }
 
-		bool remove_nth_if(size_t N, Predicate const &predicate, Predicate const &takeown=NULL) {
+		bool remove_nth_if(size_t N, Predicate const &predicate, Predicate const &takeown=nullptr) {
 			bool Ret = false;
-			ItemType* prev = NULL;
+			ItemType* prev = nullptr;
 			size_t i = 0;
 			enumerate([&](ItemType *it){
 				if (!predicate || predicate(it->value()))
@@ -180,11 +181,11 @@ class LinkedList {
 		}
 
 		bool pop_front(Predicate const &takeown)
-		{ return remove_nth_if(0, NULL, takeown); }
+		{ return remove_nth_if(0, nullptr, takeown); }
 
-		void clear(){
+		void clear(void){
 			if (_head) {
-				ItemType* prev = NULL;
+				ItemType* prev = nullptr;
 				enumerate([&](ItemType *it){
 					if (prev) {
 						if (_onRemove) _onRemove(prev->value());
@@ -197,7 +198,7 @@ class LinkedList {
 					if (_onRemove) _onRemove(prev->value());
 					delete prev;
 				}
-				_head = _tail = NULL;
+				_head = _tail = nullptr;
 				_count = 0;
 			}
 		}

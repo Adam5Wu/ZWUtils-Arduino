@@ -24,18 +24,18 @@
 
 class StringArray : public LinkedList<String> {
 	public:
-		StringArray() : LinkedList(NULL) {}
+		StringArray(void) : LinkedList(nullptr) {}
 
-		bool contains(const String& str) const {
+		bool contains(String const &str) const {
 			return get_if([&](String const &v) {
 				return str.equals(v);
-			}) != NULL;
+			}) != nullptr;
 		}
 
-		bool containsIgnoreCase(const String& str) const {
+		bool containsIgnoreCase(String const &str) const {
 			return get_if([&](String const &v) {
 				return str.equalsIgnoreCase(v);
-			}) != NULL;
+			}) != nullptr;
 		}
 };
 
