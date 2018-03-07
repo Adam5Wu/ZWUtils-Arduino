@@ -76,7 +76,8 @@ PGM_P UnitName(SizeUnit const &Unit, bool const &Abbrv) {
 }
 
 template <class T>
-String _ToString(int64_t const &Value, T const &DataUnit, bool Abbrv, bool OmitPlus, T const &HiUnit, T const &LoUnit) {
+String _ToString(int64_t const &Value, T const &DataUnit, bool Abbrv, bool OmitPlus,
+	T const &HiUnit, T const &LoUnit) {
 	String Ret;
 
 	uint64_t Rem = abs(Value);
@@ -104,10 +105,12 @@ String _ToString(int64_t const &Value, T const &DataUnit, bool Abbrv, bool OmitP
 	return Ret;
 }
 
-String ToString(int64_t const &Value, TimeUnit const &DataUnit, bool Abbrv, bool OmitPlus, TimeUnit const &HiUnit, TimeUnit const &LoUnit) {
+String ToString(int64_t const &Value, TimeUnit const &DataUnit, bool Abbrv,
+	bool OmitPlus, TimeUnit const &LoUnit, TimeUnit const &HiUnit) {
 	return _ToString(Value, DataUnit, Abbrv, OmitPlus, HiUnit, LoUnit);
 }
 
-String ToString(int64_t const &Value, SizeUnit const &DataUnit, bool Abbrv, bool OmitPlus, SizeUnit const &HiUnit, SizeUnit const &LoUnit) {
+String ToString(int64_t const &Value, SizeUnit const &DataUnit, bool Abbrv,
+	bool OmitPlus, SizeUnit const &LoUnit, SizeUnit const &HiUnit) {
 	return _ToString(Value, DataUnit, Abbrv, OmitPlus, HiUnit, LoUnit);
 }

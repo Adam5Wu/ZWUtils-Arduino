@@ -38,7 +38,7 @@ uint64_t Convert(uint64_t const &Value, TimeUnit const &From, TimeUnit const &To
 uint64_t Convert(uint64_t &Value, TimeUnit const &From, TimeUnit const &To);
 PGM_P UnitName(TimeUnit const &Unit, bool const &Abbrv = false);
 String ToString(int64_t const &Value, TimeUnit const &DataUnit, bool Abbrv = false, bool OmitPlus = true,
-	TimeUnit const &HiUnit = TimeUnit::__END, TimeUnit const &LoUnit = TimeUnit::MSEC);
+	TimeUnit const &LoUnit = TimeUnit::MSEC, TimeUnit const &HiUnit = TimeUnit::__END);
 
 inline TimeUnit operator++(TimeUnit& x) {
 	switch (x) {
@@ -82,7 +82,7 @@ uint64_t Convert(uint64_t const &Value, SizeUnit const &From, SizeUnit const &To
 uint64_t Convert(uint64_t &Value, SizeUnit const &From, SizeUnit const &To);
 PGM_P UnitName(SizeUnit const &Unit, bool const &Abbrv = false);
 String ToString(int64_t const &Value, SizeUnit const &DataUnit, bool Abbrv = false, bool OmitPlus = true,
-	SizeUnit const &HiUnit = SizeUnit::__END, SizeUnit const &LoUnit = SizeUnit::KB);
+	SizeUnit const &LoUnit = SizeUnit::BYTE, SizeUnit const &HiUnit = SizeUnit::__END);
 
 inline SizeUnit operator++(SizeUnit& x) {
 	switch (x) {
