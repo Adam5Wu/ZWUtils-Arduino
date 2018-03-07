@@ -33,7 +33,7 @@
 #ifndef ESPZW_DEBUG_LEVEL
 #define ESPZW_DEBUG_LEVEL 0
 #endif
-	
+
 #define PROGMEM_C  __attribute__((section(".irom.text.log.common")))
 #define PROGMEM_T  __attribute__((section(".irom.text.log.template")))
 #define PROGMEM_L  __attribute__((section(".irom.text.log.local")))
@@ -129,9 +129,12 @@ void putQuotedToken(String const &token, String &out, char const delim = ';', bo
 
 bool pathIsAbsolute(String const &path);
 String pathGetParent(String const &path);
-String pathGetEntryName(String const &path);
-String pathAppend(String const &path, const char *token);
-String pathAppend(String const &path, String const &token);
+const char *pathGetEntryName(String const &path);
+const char *pathGetEntryName(String const &path, uint16_t len);
+void pathAppend(String &path, const char *token);
+void pathAppend(String &path, String const &token);
+String pathJoin(String const &path, const char *token);
+String pathJoin(String const &path, String const &token);
 
 fs::Dir mkdir(fs::FS &fs, String const &path);
 fs::Dir mkdirs(fs::FS &fs, String const &path);

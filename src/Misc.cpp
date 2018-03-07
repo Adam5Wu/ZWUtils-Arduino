@@ -122,24 +122,33 @@ String pathGetParent(String const &path) {
 	return String(path.begin(), delim_pos);
 }
 
-String pathGetEntryName(String const &path) {
-	int delim_pos = path.lastIndexOf('/');
-	if (delim_pos < 0) return path;
-	return path.begin() + delim_pos;
+const char *pathGetEntryName(const char *path, uint16_t len) {
+	const char* p = path+len;
+	while (p > path && *p != '/') --p;
+	return *p == '/'? p+1 : p;
 }
 
-String pathAppend(String const &path, const char *token) {
-	String Ret(path);
-	Ret.concat('/');
-	Ret.concat(token);
-	return Ret;
+const char *pathGetEntryName(String const &path) {
+	return pathGetEntryName(path.c_str(), path.length());
 }
 
-String pathAppend(String const &path, String const &token) {
-	String Ret(path);
-	Ret.concat('/');
-	Ret.concat(token);
-	return Ret;
+void pathAppend(String &path, const char *token) {
+	pathAppend(path, String(token));
+}
+
+void pathAppend(String &path, String const &token) {
+	if (!path || path.end()[-1] != '/') path.concat('/');
+	path.concat(token);
+}
+
+String pathJoin(String const &path, const char *token) {
+	return pathJoin(path, String(token));
+}
+
+String pathJoin(String const &path, String const &token) {
+	String Ret = path;
+	pathAppend(Ret, token);
+	return std::move(Ret);
 }
 
 fs::Dir mkdir(fs::FS &fs, String const &path) {
