@@ -26,17 +26,34 @@ class StringArray : public LinkedList<String> {
 	public:
 		StringArray(void) : LinkedList(nullptr) {}
 
-		bool contains(String const &str) const {
+		bool contains(String const &s, bool ignoreCase = false) const {
 			return get_if([&](String const &v) {
-				return str.equals(v);
+				return ignoreCase? v.equalsIgnoreCase(s) : v == s;
 			}) != nullptr;
 		}
 
-		bool containsIgnoreCase(String const &str) const {
+		bool contains(const char *cstr, bool ignoreCase = false) const {
 			return get_if([&](String const &v) {
-				return str.equalsIgnoreCase(v);
+				return ignoreCase? v.equalsIgnoreCase(cstr) : v == cstr;
 			}) != nullptr;
 		}
+	
+		bool contains(const __FlashStringHelper *str,
+			bool ignoreCase = false) const {
+			return get_if([&](String const &v) {
+				return ignoreCase? v.equalsIgnoreCase(str) : v == str;
+			}) != nullptr;
+		}
+	
+		bool containsIgnoreCase(String const &s) const
+		{ return contains(s, true); }
+		
+		bool containsIgnoreCase(const char *cstr) const
+		{ return contains(cstr, true); }
+
+		bool containsIgnoreCase(const __FlashStringHelper *str) const
+		{ return contains(str, true); }
+		
 };
 
 #endif /* StringArray_H_ */

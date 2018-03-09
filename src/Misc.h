@@ -34,15 +34,15 @@
 #define ESPZW_DEBUG_LEVEL 0
 #endif
 
-#define PROGMEM_C  __attribute__((section(".irom.text.log.common")))
-#define PROGMEM_T  __attribute__((section(".irom.text.log.template")))
-#define PROGMEM_L  __attribute__((section(".irom.text.log.local")))
+#define LPROGMEM_C  __attribute__((section(".irom.text.log.common")))
+#define LPROGMEM_T  __attribute__((section(".irom.text.log.template")))
+#define LPROGMEM_L  __attribute__((section(".irom.text.log.local")))
 
 #ifndef ESPZW_LOG
 #if ESPZW_LOG_TIME
 #define ESPZW_LOG_X(spfx, fmt, ...)											\
 { 																			\
-	static const char __pfmt__[] PROGMEM ## spfx =							\
+	static const char __pfmt__[] LPROGMEM ## spfx =							\
 		"%5"PRIu32".%03"PRIu16" | " fmt;									\
 	timeval __log_time__; gettimeofday(&__log_time__, NULL);				\
 	Serial.printf_P(__pfmt__, (uint32_t)(__log_time__.tv_sec % 100000),		\
@@ -51,7 +51,7 @@
 #else
 #define ESPZW_LOG_X(spfx, fmt, ...)							\
 { 															\
-	static const char __pfmt__[] PROGMEM ## spfx = fmt;		\
+	static const char __pfmt__[] LPROGMEM ## spfx = fmt;	\
 	Serial.printf_P(__pfmt__, ## __VA_ARGS__);				\
 }
 #endif
@@ -88,6 +88,24 @@
 	#define ESPZW_DEBUGVV(...) ESPZW_LOG(__VA_ARGS__)
 	#define ESPZW_DEBUGVV_S(...) ESPZW_LOG_S(__VA_ARGS__)
 #endif
+
+#define SPROGMEM_C  __attribute__((section(".irom.text.str.common")))
+#define SPROGMEM_T  __attribute__((section(".irom.text.str.template")))
+#define SPROGMEM_L  __attribute__((section(".irom.text.str.local")))
+
+#define SPSTR_X(spfx, s) (__extension__({ \
+	static const char __c[] SPROGMEM_ ## spfx = (s); &__c[0]; \
+}))
+
+#define PSTR_C(s) SPSTR_X(C,s)
+#define PSTR_T(s) SPSTR_X(T,s)
+#define PSTR_L(s) SPSTR_X(L,s)
+	
+#define FC(string_literal) (FPSTR(PSTR_C(string_literal)))
+#define FT(string_literal) (FPSTR(PSTR_T(string_literal)))
+#define FL(string_literal) (FPSTR(PSTR_L(string_literal)))
+	
+#define SFPSTR(x) String(FPSTR(x)).c_str()
 
 extern char const HexLookup_UC[];
 extern char const HexLookup_LC[];
