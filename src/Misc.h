@@ -92,6 +92,7 @@
 #define SPROGMEM_C  __attribute__((section(".irom.text.str.common")))
 #define SPROGMEM_T  __attribute__((section(".irom.text.str.template")))
 #define SPROGMEM_L  __attribute__((section(".irom.text.str.local")))
+#define SPROGMEM_S  __attribute__((section(".irom.text.str.static")))
 
 #define SPSTR_X(spfx, s) (__extension__({ \
 	static const char __c[] SPROGMEM_ ## spfx = (s); &__c[0]; \
@@ -100,11 +101,11 @@
 #define PSTR_C(s) SPSTR_X(C,s)
 #define PSTR_T(s) SPSTR_X(T,s)
 #define PSTR_L(s) SPSTR_X(L,s)
-	
+
 #define FC(string_literal) (FPSTR(PSTR_C(string_literal)))
 #define FT(string_literal) (FPSTR(PSTR_T(string_literal)))
 #define FL(string_literal) (FPSTR(PSTR_L(string_literal)))
-	
+
 #define SFPSTR(x) String(FPSTR(x)).c_str()
 
 extern char const HexLookup_UC[];

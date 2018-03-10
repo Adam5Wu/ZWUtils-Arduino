@@ -37,23 +37,23 @@ class StringArray : public LinkedList<String> {
 				return ignoreCase? v.equalsIgnoreCase(cstr) : v == cstr;
 			}) != nullptr;
 		}
-	
+
 		bool contains(const __FlashStringHelper *str,
 			bool ignoreCase = false) const {
 			return get_if([&](String const &v) {
 				return ignoreCase? v.equalsIgnoreCase(str) : v == str;
 			}) != nullptr;
 		}
-	
+
 		bool containsIgnoreCase(String const &s) const
 		{ return contains(s, true); }
-		
+
 		bool containsIgnoreCase(const char *cstr) const
 		{ return contains(cstr, true); }
 
 		bool containsIgnoreCase(const __FlashStringHelper *str) const
 		{ return contains(str, true); }
-		
+
 };
 
 #endif /* StringArray_H_ */
