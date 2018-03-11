@@ -42,8 +42,7 @@
 #if ESPZW_LOG_TIME
 #define ESPZW_LOG_X(spfx, fmt, ...)											\
 { 																			\
-	static const char __pfmt__[] LPROGMEM ## spfx =							\
-		"%5"PRIu32".%03"PRIu16" | " fmt;									\
+	static const char __pfmt__[] LPROGMEM ## spfx = "%5d.%03d | " fmt;		\
 	timeval __log_time__; gettimeofday(&__log_time__, NULL);				\
 	Serial.printf_P(__pfmt__, (uint32_t)(__log_time__.tv_sec % 100000),		\
 		(uint16_t)(__log_time__.tv_usec / 1000), ## __VA_ARGS__);			\
