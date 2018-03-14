@@ -32,7 +32,6 @@ class LinkedListNode {
 
 		LinkedListNode(const T &val): _value(val), next(nullptr) {}
 		LinkedListNode(T &&val): _value(std::move(val)), next(nullptr) {}
-		virtual ~LinkedListNode(void) {}
 
 		const T& value(void) const { return _value; }
 		T& value(void){ return _value; }
@@ -88,7 +87,7 @@ class LinkedList {
 		: _head(nullptr), _tail(nullptr), _count(0), _onRemove(onRemove) {}
 		LinkedList(OnRemove const &onRemove, std::initializer_list<T> items)
 		: LinkedList(onRemove) { for (auto& item : items) append(item); }
-		virtual ~LinkedList(void) { clear(); }
+		/*virtual*/ ~LinkedList(void) { clear(); }
 
 		LinkedList(LinkedList &&src)
 		: _head(src._head), _tail(src._tail), _count(src._count), _onRemove(std::move(src._onRemove))
