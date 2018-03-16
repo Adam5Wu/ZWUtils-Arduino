@@ -173,7 +173,7 @@ static fs::Dir mkdirs_recursive(fs::FS &fs, String const &path) {
 		return parentDir;
 	}
 	ESPZW_DEBUGV("Creating directory '%s'\n", path.c_str());
-	return parentDir.openDir(path.c_str(), true);
+	return parentDir.openDir(pathGetEntryName(path), true);
 }
 
 fs::Dir mkdirs(fs::FS &fs, String const &path) {
