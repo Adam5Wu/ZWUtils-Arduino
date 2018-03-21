@@ -33,7 +33,7 @@ class LinkedListNode {
 		LinkedListNode(const T &val): _value(val), next(nullptr) {}
 		LinkedListNode(T &&val): _value(std::move(val)), next(nullptr) {}
 
-		const T& value(void) const { return _value; }
+		T const &value(void) const { return _value; }
 		T& value(void){ return _value; }
 };
 
@@ -47,34 +47,69 @@ class LinkedList {
 			public:
 				Iterator(ItemType* current = nullptr) : _node(current) {}
 				Iterator(const Iterator& i) : _node(i._node) {}
-				Iterator& operator ++(void) { _node = _node->next; return *this; }
-				bool operator != (const Iterator& i) const { return _node != i._node; }
-				const T& operator * (void) const { return _node->value(); }
-				const T* operator -> (void) const { return &_node->value(); }
+				Iterator& operator ++(void)
+				{ return (_node = _node? _node->next : _node), *this; }
+				operator bool() const { return _node; }
+				bool operator != (const Iterator& i) const
+				{ return _node != i._node; }
+				const T* operator -> (void) const
+				{ return _node? &_node->value() : nullptr; }
+				T const &operator * (void) const { return _node->value(); }
 		};
 
 		typedef const Iterator ConstIterator;
 
-		typedef std::function<void(T&)> OnRemove;
 		typedef std::function<bool(const T&)> Predicate;
+		typedef std::function<bool(ConstIterator&, ConstIterator&)> DuoPredicate;
+		typedef std::function<void(T&)> Modifier;
+		typedef std::function<bool(T&)> Modicate;
 
 	protected:
 		ItemType *_head, *_tail;
 		size_t _count;
-		OnRemove _onRemove;
+		Modifier _onRemove;
 
 		size_t _addhead(ItemType *it) {
-			it->next = _head;
-			_head = it;
-			if (!_tail) _tail = it;
-			return _count++;
+			if (it) {
+				it->next = _head;
+				_head = it;
+				if (!_tail) _tail = it;
+				return _count++;
+			}
+			return _count;
 		}
 
 		size_t _addtail(ItemType *it) {
-			if (_tail) _tail->next = it;
-			_tail = it;
-			if (!_head) _head = it;
-			return _count++;
+			if (it) {
+				if (_tail) _tail->next = it;
+				_tail = it;
+				if (!_head) _head = it;
+				return _count++;
+			}
+			return _count;
+		}
+
+		size_t _addBetween(ItemType *it, DuoPredicate const &predicate) {
+			if (it) {
+				ItemType *A = nullptr;
+				ItemType *B = _head;
+				while (true) {
+					if (predicate(A, B)) {
+						if (!A) return _addhead(it);
+						if (!B) return _addtail(it);
+						A->next = it;
+						it->next = B;
+						it = nullptr;
+						break;
+					}
+					A = B;
+					if (B) B = B->next;
+					else break;
+				}
+				if (it) delete(it);
+				else return _count++;
+			}
+			return _count;
 		}
 
 		typedef std::function<bool(ItemType *)> EnumStep;
@@ -83,11 +118,11 @@ class LinkedList {
 			while(it && enumstep(it)) it = it->next;
 		}
 	public:
-		LinkedList(OnRemove const &onRemove)
+		LinkedList(Modifier const &onRemove)
 		: _head(nullptr), _tail(nullptr), _count(0), _onRemove(onRemove) {}
-		LinkedList(OnRemove const &onRemove, std::initializer_list<T> items)
+		LinkedList(Modifier const &onRemove, std::initializer_list<T> items)
 		: LinkedList(onRemove) { for (auto& item : items) append(item); }
-		/*virtual*/ ~LinkedList(void) { clear(); }
+		~LinkedList(void) { clear(); }
 
 		LinkedList(LinkedList &&src)
 		: _head(src._head), _tail(src._tail), _count(src._count), _onRemove(std::move(src._onRemove))
@@ -104,12 +139,17 @@ class LinkedList {
 		T& front(void) const { return _head->value(); }
 		T& back(void) const { return _tail->value(); }
 		ConstIterator begin(void) const { return ConstIterator(_head); }
-		ConstIterator end(void) const { return ConstIterator(nullptr); }
+		ConstIterator end(void) const { return ConstIterator(); }
 
-		size_t prepend(const T& t) { return _addhead(new ItemType(t)); }
+		size_t prepend(T const &t) { return _addhead(new ItemType(t)); }
 		size_t prepend(T && t) { return _addhead(new ItemType(std::move(t))); }
-		size_t append(const T& t) { return _addtail(new ItemType(t)); }
+		size_t append(T const &t) { return _addtail(new ItemType(t)); }
 		size_t append(T && t) { return _addtail(new ItemType(std::move(t))); }
+
+		size_t insert(T const &t, DuoPredicate const &predicate)
+		{ return _addBetween(new ItemType(t), predicate); }
+		size_t insert(T && t, DuoPredicate const &predicate)
+		{ return _addBetween(new ItemType(std::move(t)), predicate); }
 
 		size_t length(void) const { return _count; }
 
@@ -200,6 +240,14 @@ class LinkedList {
 				_head = _tail = nullptr;
 				_count = 0;
 			}
+		}
+
+		size_t apply(Modicate const &modicate) {
+			size_t i = 0;
+			enumerate([&](ItemType *it){
+				return i++, modicate(it->value());
+			});
+			return i;
 		}
 };
 
