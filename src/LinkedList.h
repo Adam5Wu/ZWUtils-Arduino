@@ -114,9 +114,25 @@ class LinkedList {
 
 		typedef std::function<bool(ItemType *)> EnumStep;
 		void enumerate(EnumStep const &enumstep) const {
-			auto it = _head;
-			while(it && enumstep(it)) it = it->next;
+			auto next = _head;
+			while (auto it = next) {
+				next = it->next;
+				if (!enumstep(it)) break;
+			}
 		}
+
+		void remove(ItemType *prev, Predicate const &takeown) {
+			auto it = prev ? prev->next : _head;
+			if (prev) prev->next = it->next;
+			else _head = it->next;
+			if (_tail == it) _tail = prev;
+			_count--;
+
+			bool handoff = takeown && takeown(it->value());
+			if (!handoff && _onRemove) _onRemove(it->value());
+			delete it;
+		}
+
 	public:
 		LinkedList(Modifier const &onRemove)
 		: _head(nullptr), _tail(nullptr), _count(0), _onRemove(onRemove) {}
@@ -201,15 +217,7 @@ class LinkedList {
 			enumerate([&](ItemType *it){
 				if (!predicate || predicate(it->value()))
 					if (i++ == N) {
-						if (prev) prev->next = it->next;
-						else _head = it->next;
-						if (_tail == it) _tail = prev;
-						_count--;
-
-						bool handoff = takeown && takeown(it->value());
-						if (!handoff && _onRemove) _onRemove(it->value());
-						delete it;
-
+						remove(prev, takeown);
 						Ret = true;
 						return false;
 					}
@@ -223,29 +231,31 @@ class LinkedList {
 		{ return remove_nth_if(0, nullptr, takeown); }
 
 		void clear(void){
-			if (_head) {
-				ItemType* prev = nullptr;
-				enumerate([&](ItemType *it){
-					if (prev) {
-						if (_onRemove) _onRemove(prev->value());
-						delete prev;
-					}
-					prev = it;
-					return true;
-				});
-				if (prev) {
-					if (_onRemove) _onRemove(prev->value());
-					delete prev;
-				}
-				_head = _tail = nullptr;
-				_count = 0;
-			}
+			enumerate([&](ItemType *it){
+				// Since everything will be removed, don't bother update chain/head
+				if (_onRemove) _onRemove(it->value());
+				delete it;
+				return true;
+			});
+			_head = _tail = nullptr;
+			_count = 0;
 		}
 
 		size_t apply(Modicate const &modicate) {
 			size_t i = 0;
 			enumerate([&](ItemType *it){
-				return i++, modicate(it->value());
+				return ++i, modicate(it->value());
+			});
+			return i;
+		}
+
+		size_t prune(Modicate const &modicate, Predicate const &takeown=nullptr) {
+			size_t i = 0;
+			enumerate([&](ItemType *it){
+				if (modicate(it->value())) {
+					remove(it, takeown), ++i;
+				}
+				return true;
 			});
 			return i;
 		}
