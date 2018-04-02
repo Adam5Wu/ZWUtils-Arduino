@@ -114,13 +114,13 @@ extern char const HexLookup_LC[];
 #define MD5_TXTLEN	(MD5_BINLEN*2)
 
 // out is a 16 byte buffer
-void calcMD5(uint8_t* data, uint16_t len, uint8_t *out);
+void calcMD5(void const *data, uint16_t len, uint8_t *out);
 // text is a 32 char buffer, Lookup is a mapping of hex numbers
-void textMD5(uint8_t* data, uint16_t len, char *text, char const *Lookup);
+void textMD5(void const *data, uint16_t len, char *text, char const *Lookup);
 
-inline void textMD5_UC(uint8_t* data, uint16_t len, char *text)
+inline void textMD5_UC(void const *data, uint16_t len, char *text)
 { textMD5(data,len,text,HexLookup_UC); }
-inline void textMD5_LC(uint8_t* data, uint16_t len, char *text)
+inline void textMD5_LC(void const *data, uint16_t len, char *text)
 { textMD5(data,len,text,HexLookup_LC); }
 
 #if ESPZW_SHA256
@@ -129,13 +129,13 @@ inline void textMD5_LC(uint8_t* data, uint16_t len, char *text)
 #define SHA256_TXTLEN	(SHA256_BINLEN*2)
 
 // out is a 64 byte buffer
-void calcSHA256(uint8_t* data, uint16_t len, uint8_t *out);
+void calcSHA256(void const *data, uint16_t len, uint8_t *out);
 // text is a 128 char buffer, Lookup is a mapping of hex numbers
-void textSHA256(uint8_t* data, uint16_t len, char *text, char const *Lookup);
+void textSHA256(void const *data, uint16_t len, char *text, char const *Lookup);
 
-inline void textSHA256_UC(uint8_t* data, uint16_t len, char *text)
+inline void textSHA256_UC(void const *data, uint16_t len, char *text)
 { textSHA256(data,len,text,HexLookup_UC); }
-inline void textSHA256_LC(uint8_t* data, uint16_t len, char *text)
+inline void textSHA256_LC(void const *data, uint16_t len, char *text)
 { textSHA256(data,len,text,HexLookup_LC); }
 
 #endif

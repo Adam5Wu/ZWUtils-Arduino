@@ -31,14 +31,14 @@ char const HexLookup_LC[] =
 
 #include "md5.h"
 
-void calcMD5(uint8_t* data, uint16_t len, uint8_t *out) {
+void calcMD5(void const *data, uint16_t len, uint8_t *out) {
 	md5_context_t _ctx;
 	MD5Init(&_ctx);
-	MD5Update(&_ctx, data, len);
+	MD5Update(&_ctx, (uint8_t const *)data, len);
 	MD5Final(out, &_ctx);
 }
 
-void textMD5(uint8_t* data, uint16_t len, char *text, char const *Lookup) {
+void textMD5(void const *data, uint16_t len, char *text, char const *Lookup) {
 	uint8_t buf[16];
 	calcMD5(data,len,buf);
 	for(uint8_t i = 0; i < 16; i++) {
@@ -51,14 +51,14 @@ void textMD5(uint8_t* data, uint16_t len, char *text, char const *Lookup) {
 
 #include "sha256.h"
 
-void calcSHA256(uint8_t* data, uint16_t len, uint8_t *out) {
+void calcSHA256(void const *data, uint16_t len, uint8_t *out) {
 	sha256_context_t _ctx;
 	SHA256Init(&_ctx);
 	SHA256Update(&_ctx, data, len);
 	SHA256Final(out, &_ctx);
 }
 
-void textSHA256(uint8_t* data, uint16_t len, char *text, char const *Lookup) {
+void textSHA256(void const *data, uint16_t len, char *text, char const *Lookup) {
 	uint8_t buf[64];
 	calcSHA256(data,len,buf);
 	for(uint8_t i = 0; i < 64; i++) {
