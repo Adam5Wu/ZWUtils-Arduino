@@ -23,11 +23,8 @@
 
 #include "Misc.h"
 
-char const HexLookup_UC[] =
-{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-char const HexLookup_LC[] =
-{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+PGM_P HexLookup_UC SPROGMEM_C = "0123456789ABCDEF";
+PGM_P HexLookup_LC SPROGMEM_C = "0123456789abcdef";
 
 #include "md5.h"
 
@@ -38,12 +35,12 @@ void calcMD5(void const *data, uint16_t len, uint8_t *out) {
 	MD5Final(out, &_ctx);
 }
 
-void textMD5(void const *data, uint16_t len, char *text, char const *Lookup) {
+void textMD5(void const *data, uint16_t len, char *text, PGM_P Lookup) {
 	uint8_t buf[16];
 	calcMD5(data,len,buf);
 	for(uint8_t i = 0; i < 16; i++) {
-		text[i*2+0] = Lookup[(buf[i] >> 4) & 0xF];
-		text[i*2+1] = Lookup[(buf[i] >> 0) & 0xF];
+		text[i*2+0] = pgm_read_byte_inlined(Lookup + ((buf[i] >> 4) & 0xF));
+		text[i*2+1] = pgm_read_byte_inlined(Lookup + ((buf[i] >> 0) & 0xF));
 	}
 }
 
@@ -62,8 +59,8 @@ void textSHA256(void const *data, uint16_t len, char *text, char const *Lookup) 
 	uint8_t buf[64];
 	calcSHA256(data,len,buf);
 	for(uint8_t i = 0; i < 64; i++) {
-		text[i*2+0] = Lookup[(buf[i] >> 4) & 0xF];
-		text[i*2+1] = Lookup[(buf[i] >> 0) & 0xF];
+		text[i*2+0] = pgm_read_byte_inlined(Lookup + ((buf[i] >> 4) & 0xF));
+		text[i*2+1] = pgm_read_byte_inlined(Lookup + ((buf[i] >> 0) & 0xF));
 	}
 }
 
@@ -109,6 +106,21 @@ void putQuotedToken(String const &token, String &out, char const delim, bool del
 		}
 		out.concat('"');
 	} else out.concat(token);
+}
+
+static PGM_P MONTHNAMES SPROGMEM_T = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+String getBuildStamp(String const &date, String const &time) {
+	String Ret('\0',8);
+	int month, day, year;
+    sscanf(date.c_str(), SFPSTR(PSTR_L("%s %d %d")), Ret.begin(), &day, &year);
+    month = (strstr_P(MONTHNAMES, Ret.begin())-MONTHNAMES)/3+1;
+	sprintf_P(Ret.begin(), PSTR_L("%04d%02d%02d"), year, month, day);
+	Ret.concat('-');
+	Ret.concat(time.begin(),2);
+	Ret.concat(time.begin()+3,2);
+	Ret.concat(time.begin()+6,2);
+	return std::move(Ret);
 }
 
 bool pathIsAbsolute(String const &path) {

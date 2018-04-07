@@ -107,8 +107,8 @@
 
 #define SFPSTR(x) String(FPSTR(x)).c_str()
 
-extern char const HexLookup_UC[];
-extern char const HexLookup_LC[];
+extern PGM_P HexLookup_UC;
+extern PGM_P HexLookup_LC;
 
 #define MD5_BINLEN	16
 #define MD5_TXTLEN	(MD5_BINLEN*2)
@@ -142,6 +142,8 @@ inline void textSHA256_LC(void const *data, uint16_t len, char *text)
 
 String getQuotedToken(char const *&ptr, char const delim = ';');
 void putQuotedToken(String const &token, String &out, char const delim = ';', bool delimPfx = true, bool forceQuote = false);
+
+String getBuildStamp(String const &date, String const &time);
 
 #include "FS.h"
 
