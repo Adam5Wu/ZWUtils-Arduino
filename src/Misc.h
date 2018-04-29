@@ -22,7 +22,7 @@
 #define ZWUtils_Misc_H_
 
 #ifndef ESPZW_LOG_TIME
-#define ESPZW_LOG_TIME 0
+#define ESPZW_LOG_TIME 1
 #endif
 
 #include "WString.h"
