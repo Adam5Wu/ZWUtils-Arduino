@@ -249,10 +249,10 @@ class LinkedList {
 			return i;
 		}
 
-		size_t prune(Modicate const &modicate, Predicate const &takeown=nullptr) {
+		size_t prune(Predicate const &predicate, Predicate const &takeown=nullptr) {
 			size_t i = 0;
 			enumerate([&](ItemType *it){
-				if (modicate(it->value())) {
+				if (predicate(it->value())) {
 					remove(it, takeown), ++i;
 				}
 				return true;
